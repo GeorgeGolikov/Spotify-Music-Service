@@ -23,7 +23,7 @@ class SyncPointController {
     }
 
     @PostMapping("/playlist/{name}")
-    fun addPlaylist(@PathVariable(name = "name") name: String,
+    fun addPlaylist(@PathVariable("name") name: String,
                     @RequestParam("id") uuid: UUID,
                     @RequestBody listOfTracks: List<Track>): ResponseEntity<HttpStatus> {
         /*

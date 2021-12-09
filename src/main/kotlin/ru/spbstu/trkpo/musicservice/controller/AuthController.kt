@@ -28,9 +28,9 @@ class AuthController {
         return ResponseEntity(authService.register(authCode), HttpStatus.OK)
     }
 
-    @PostMapping("/register")
+    @PostMapping("/register/{id}")
     fun register(@RequestHeader("Authorization") authCode: String,
-                 @RequestParam("id") uuid: UUID): ResponseEntity<HttpStatus> {
+                 @PathVariable("id") uuid: UUID): ResponseEntity<HttpStatus> {
         /*
         * TODO: implement
         * */
