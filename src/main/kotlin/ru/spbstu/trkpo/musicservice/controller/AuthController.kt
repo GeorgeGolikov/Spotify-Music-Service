@@ -24,7 +24,6 @@ class AuthController {
     @PostMapping("/register")
     fun register(@RequestBody registerRequest: RegisterRequest): ResponseEntity<RegisterResponse> {
         val guid = authService.register(registerRequest.authCode) ?: return ResponseEntity.badRequest().build()
-
         return ResponseEntity(
             RegisterResponse(guid),
             HttpStatus.OK
@@ -33,10 +32,8 @@ class AuthController {
 
     @PostMapping("/authorize")
     fun authorize(@RequestBody authRequest: AuthRequest): ResponseEntity<HttpStatus> {
-        /*
-        * TODO: implement
-        * */
-        authService.authorize(authRequest.authCode, authRequest.userId)
-        return ResponseEntity.ok().build()
+        val authorized = authService.authorize(authRequest.authCode, authRequest.userId)
+        return if (authorized) ResponseEntity.ok().build()
+            else ResponseEntity.badRequest().build()
     }
 }

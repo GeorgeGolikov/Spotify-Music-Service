@@ -9,7 +9,7 @@ import ru.spbstu.trkpo.musicservice.service.AuthService
 import java.util.*
 
 @Service
-class AuthServiceImpl: AuthService {
+class AuthServiceImpl : AuthService {
     @Autowired
     private lateinit var tokensInfo: TokensInfoDao
 
@@ -33,10 +33,12 @@ class AuthServiceImpl: AuthService {
         return guid
     }
 
-    /*
-    * TODO: implement
-    * */
-    override fun authorize(authCode: String, uuid: UUID) {
-
+    override fun authorize(authCode: String, uuid: UUID): Boolean {
+        val tokens = musicServiceApiAggregator.musicServiceApi.register(authCode) ?: return false
+        val userInfo = tokensInfo.findByUserId(uuid) ?: return false
+        userInfo.accessToken = tokens.accessToken
+        userInfo.refreshToken = tokens.refreshToken
+        tokensInfo.save(userInfo)
+        return true
     }
 }
