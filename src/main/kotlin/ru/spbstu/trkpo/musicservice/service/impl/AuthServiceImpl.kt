@@ -25,7 +25,7 @@ class AuthServiceImpl: AuthService {
     /*
     * TODO: implement
     * */
-    override fun authorize(authCode: String): UUID {
+    override fun register(authCode: String): UUID {
         return UUID.randomUUID()
     }
 
