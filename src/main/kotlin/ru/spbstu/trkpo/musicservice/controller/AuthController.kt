@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import ru.spbstu.trkpo.musicservice.dto.AuthRequest
 import ru.spbstu.trkpo.musicservice.service.AuthService
 import java.util.*
 
@@ -21,20 +22,19 @@ class AuthController {
     }
 
     @PostMapping("/register")
-    fun register(@RequestHeader("Authorization") authCode: String): ResponseEntity<UUID> {
+    fun register(@RequestBody authCode: String): ResponseEntity<UUID> {
         /*
         * TODO: implement
         * */
-        return ResponseEntity(authService.register(authCode), HttpStatus.OK)
+        return ResponseEntity(authService.authorize(authCode), HttpStatus.OK)
     }
 
-    @PostMapping("/register/{id}")
-    fun register(@RequestHeader("Authorization") authCode: String,
-                 @PathVariable("id") uuid: UUID): ResponseEntity<HttpStatus> {
+    @PostMapping("/authorize")
+    fun authorize(@RequestBody authRequest: AuthRequest): ResponseEntity<HttpStatus> {
         /*
         * TODO: implement
         * */
-        authService.register(authCode, uuid)
+        authService.authorize(authRequest.authCode, authRequest.userId)
         return ResponseEntity.ok().build()
     }
 }
