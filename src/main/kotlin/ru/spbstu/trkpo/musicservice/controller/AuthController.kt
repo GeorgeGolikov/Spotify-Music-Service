@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.spbstu.trkpo.musicservice.dto.*
 import ru.spbstu.trkpo.musicservice.service.AuthService
-import java.util.*
 
 @RestController
 class AuthController {
@@ -22,18 +21,19 @@ class AuthController {
     }
 
     @PostMapping("/register")
-    fun register(@RequestBody registerRequest: RegisterRequest): ResponseEntity<RegisterResponse> {
-        val guid = authService.register(registerRequest.authCode) ?: return ResponseEntity.badRequest().build()
-        return ResponseEntity(
-            RegisterResponse(guid),
+    fun register(@RequestBody authRequest: AuthRequest): ResponseEntity<AuthResponse> {
+        if (authRequest.userId == null) {
+            val guid = authService.register(authRequest.authCode) ?: return ResponseEntity.badRequest().build()
+            return ResponseEntity(
+                AuthResponse(guid),
+                HttpStatus.OK
+            )
+        }
+        val authorized = authService.authorize(authRequest.authCode, authRequest.userId)
+        return if (authorized) ResponseEntity(
+            AuthResponse(authRequest.userId),
             HttpStatus.OK
         )
-    }
-
-    @PostMapping("/authorize")
-    fun authorize(@RequestBody authRequest: AuthRequest): ResponseEntity<HttpStatus> {
-        val authorized = authService.authorize(authRequest.authCode, authRequest.userId)
-        return if (authorized) ResponseEntity.ok().build()
-            else ResponseEntity.badRequest().build()
+        else ResponseEntity.badRequest().build()
     }
 }
