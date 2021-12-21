@@ -6,7 +6,7 @@ import java.io.FileInputStream
 import java.util.*
 
 @Service
-class MusicServiceApiAggregator() {
+class MusicServiceApiAggregator {
     lateinit var musicServiceApi: MusicServiceApi
 
     init {
@@ -15,5 +15,6 @@ class MusicServiceApiAggregator() {
         val serviceName = properties.getProperty("music-service")
         if (serviceName == "spotify") musicServiceApi = SpotifyApi()
         if (serviceName == "apple") musicServiceApi = AppleMusicApi()
+        musicServiceApi.setProperties(properties)
     }
 }

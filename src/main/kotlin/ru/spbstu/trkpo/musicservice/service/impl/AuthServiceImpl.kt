@@ -18,8 +18,8 @@ class AuthServiceImpl: AuthService {
     /*
     * TODO: implement
     * */
-    override fun getOAuthUrl(): String {
-        return "to implement"
+    override fun getOAuthUrl(tgBotId: String): String {
+        return musicServiceApiAggregator.musicServiceApi.getUrl(tgBotId)
     }
 
     /*
