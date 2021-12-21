@@ -10,8 +10,8 @@ class TokensInfo {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private var id: Long? = null
 
-    private var userId: UUID? = null
+    var userId: UUID? = null
 
-    private var accessToken: String? = null
-    private var refreshToken: String? = null
+    var accessToken: String? = null
+    var refreshToken: String? = null
 }

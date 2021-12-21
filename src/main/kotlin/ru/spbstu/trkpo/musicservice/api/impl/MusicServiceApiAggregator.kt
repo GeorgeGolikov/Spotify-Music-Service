@@ -13,8 +13,8 @@ class MusicServiceApiAggregator {
         val properties = Properties()
         properties.load(FileInputStream("src/main/resources/application.properties"))
         val serviceName = properties.getProperty("music-service")
-        if (serviceName == "spotify") musicServiceApi = SpotifyApi()
-        if (serviceName == "apple") musicServiceApi = AppleMusicApi()
+        if (serviceName == "spotify") musicServiceApi = SpotifyServiceApi()
+        if (serviceName == "apple") musicServiceApi = AppleMusicServiceApi()
         musicServiceApi.setProperties(properties)
     }
 }
