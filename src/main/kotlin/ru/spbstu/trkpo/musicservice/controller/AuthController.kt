@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.spbstu.trkpo.musicservice.dto.AuthRequest
+import ru.spbstu.trkpo.musicservice.dto.GetUrlRequest
+import ru.spbstu.trkpo.musicservice.dto.GetUrlResponse
 import ru.spbstu.trkpo.musicservice.service.AuthService
 import java.util.*
 
@@ -14,11 +16,14 @@ class AuthController {
     private lateinit var authService: AuthService
 
     @GetMapping("/authUrl")
-    fun getOAuthUrl(): ResponseEntity<String> {
+    fun getOAuthUrl(@RequestBody request: GetUrlRequest): ResponseEntity<GetUrlResponse> {
         /*
         * TODO: implement
         * */
-        return ResponseEntity(authService.getOAuthUrl(), HttpStatus.OK)
+        return ResponseEntity(
+            GetUrlResponse(authService.getOAuthUrl(request.tgBotId)),
+            HttpStatus.OK
+        )
     }
 
     @PostMapping("/register")
@@ -26,7 +31,7 @@ class AuthController {
         /*
         * TODO: implement
         * */
-        return ResponseEntity(authService.authorize(authCode), HttpStatus.OK)
+        return ResponseEntity(authService.register(authCode), HttpStatus.OK)
     }
 
     @PostMapping("/authorize")
