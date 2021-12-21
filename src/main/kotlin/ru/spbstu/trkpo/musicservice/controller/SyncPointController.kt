@@ -18,10 +18,9 @@ class SyncPointController {
 
     @GetMapping("/playlist")
     fun getPlaylist(@RequestBody getPlaylistRequest: GetPlaylistRequest): ResponseEntity<ReturnedPlaylist> {
-        /*
-        * TODO: implement
-        * */
-        return ResponseEntity(ReturnedPlaylist("test", ArrayList<Track>(5)), HttpStatus.OK)
+        val playlist = syncPointService.getPlaylist(getPlaylistRequest.name, getPlaylistRequest.userId)
+        return if (playlist != null) ResponseEntity(playlist, HttpStatus.OK)
+        else ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
 
     @PostMapping("/playlist")
