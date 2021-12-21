@@ -1,7 +1,9 @@
 package ru.spbstu.trkpo.musicservice.api.impl
 
 import ru.spbstu.trkpo.musicservice.api.MusicServiceApi
+import ru.spbstu.trkpo.musicservice.dto.ReturnedPlaylist
 import ru.spbstu.trkpo.musicservice.dto.TokensPair
+import ru.spbstu.trkpo.musicservice.dto.Track
 import java.util.*
 
 class AppleMusicServiceApi: MusicServiceApi {
@@ -10,6 +12,18 @@ class AppleMusicServiceApi: MusicServiceApi {
     }
 
     override fun register(authCode: String): TokensPair? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getTracksFromPlaylist(name: String?, accessToken: String?): ReturnedPlaylist? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getSavedTracksPlaylistName(): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun refreshTokens(refreshToken: String?): TokensPair? {
         TODO("Not yet implemented")
     }
 
