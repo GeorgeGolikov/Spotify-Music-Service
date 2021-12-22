@@ -23,6 +23,10 @@ class AppleMusicServiceApi: MusicServiceApi {
         TODO("Not yet implemented")
     }
 
+    override fun getCustomPlaylistName(name: String?): String {
+        TODO("Not yet implemented")
+    }
+
     override fun refreshTokens(refreshToken: String?): TokensPair? {
         TODO("Not yet implemented")
     }

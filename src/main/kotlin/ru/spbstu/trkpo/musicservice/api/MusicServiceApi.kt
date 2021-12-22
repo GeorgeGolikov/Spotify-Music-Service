@@ -9,6 +9,7 @@ interface MusicServiceApi {
     fun register(authCode: String): TokensPair?
     fun getTracksFromPlaylist(name: String?, accessToken: String?): ReturnedPlaylist?
     fun getSavedTracksPlaylistName(): String
+    fun getCustomPlaylistName(name: String?): String
     fun refreshTokens(refreshToken: String?): TokensPair?
 
     fun setProperties(properties: Properties)
