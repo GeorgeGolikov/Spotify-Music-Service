@@ -11,6 +11,7 @@ interface MusicServiceApi {
     fun getSavedTracksPlaylistName(): String
     fun getCustomPlaylistName(name: String?): String
     fun refreshTokens(refreshToken: String?): TokensPair?
+    fun getPlaylistsList(accessToken: String?): List<String>?
 
     fun setProperties(properties: Properties)
     fun getReadPlaylistScopes(): String

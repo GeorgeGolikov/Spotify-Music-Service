@@ -31,6 +31,10 @@ class AppleMusicServiceApi: MusicServiceApi {
         TODO("Not yet implemented")
     }
 
+    override fun getPlaylistsList(accessToken: String?): List<String>? {
+        TODO("Not yet implemented")
+    }
+
     override fun setProperties(properties: Properties) {
         TODO("Not yet implemented")
     }

@@ -7,5 +7,6 @@ import java.util.*
 
 interface SyncPointService {
     fun getPlaylist(name: String?, userId: UUID): ReturnedPlaylist?
+    fun getPlaylistsList(userId: UUID): List<String>?
     fun addPlaylist(request: AddPlaylistRequest)
 }

@@ -21,6 +21,7 @@ class SyncPointServiceImpl: SyncPointService {
     override fun getPlaylist(name: String?, userId: UUID): ReturnedPlaylist? {
         val service = musicServiceApiAggregator.musicServiceApi
         val tokens = tokensInfo.findByUserId(userId) ?: return null
+
         val accessToken = tokens.accessToken
 
         return try {
@@ -32,6 +33,27 @@ class SyncPointServiceImpl: SyncPointService {
                 tokens.refreshToken = refreshedTokens.refreshToken
                 tokensInfo.save(tokens)
                 service.getTracksFromPlaylist(name, refreshedTokens.accessToken)
+            } else null
+        } catch (e: IOException) {
+            null
+        }
+    }
+
+    override fun getPlaylistsList(userId: UUID): List<String>? {
+        val service = musicServiceApiAggregator.musicServiceApi
+        val tokens = tokensInfo.findByUserId(userId) ?: return null
+
+        val accessToken = tokens.accessToken
+
+        return try {
+            service.getPlaylistsList(accessToken)
+        } catch (e: SpotifyWebApiException) {
+            val refreshedTokens = service.refreshTokens(tokens.refreshToken)
+            return if (refreshedTokens != null) {
+                tokens.accessToken = refreshedTokens.accessToken
+                tokens.refreshToken = refreshedTokens.refreshToken
+                tokensInfo.save(tokens)
+                service.getPlaylistsList(refreshedTokens.accessToken)
             } else null
         } catch (e: IOException) {
             null
