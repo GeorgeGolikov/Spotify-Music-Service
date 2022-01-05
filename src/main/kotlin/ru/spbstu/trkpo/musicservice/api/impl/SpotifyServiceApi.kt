@@ -1,6 +1,5 @@
 package ru.spbstu.trkpo.musicservice.api.impl
 
-import org.apache.hc.core5.http.ParseException
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
 import ru.spbstu.trkpo.musicservice.api.MusicServiceApi
@@ -35,16 +34,11 @@ class SpotifyServiceApi : MusicServiceApi {
                 "state=" + tgBotId
     }
 
-    /**
-     * TODO: раскомментить реальный запрос к Spotify API
-     * */
     override fun register(authCode: String): TokensPair? {
         val authorizationCodeRequest = spotifyApi?.authorizationCode(authCode)?.build()
         return try {
-//            val authorizationCodeCredentials = authorizationCodeRequest?.execute()
-//            TokensPair(authorizationCodeCredentials?.accessToken, authorizationCodeCredentials?.refreshToken)
-
-            TokensPair("test", "test")
+            val authorizationCodeCredentials = authorizationCodeRequest?.execute()
+            TokensPair(authorizationCodeCredentials?.accessToken, authorizationCodeCredentials?.refreshToken)
         } catch (e: SpotifyWebApiException) {
             null
         } catch (e: IOException) {
@@ -70,7 +64,8 @@ class SpotifyServiceApi : MusicServiceApi {
             val getListOfCurrentUsersPlaylistsRequest = spotifyApi?.listOfCurrentUsersPlaylists?.build()
 
             val playlists = getListOfCurrentUsersPlaylistsRequest?.execute() // get the user's playlists REQUEST
-            val foundPlaylist = playlists?.items?.find { p -> p.name == name }
+            val nameLowerCase = name.lowercase()
+            val foundPlaylist = playlists?.items?.find { p -> p.name.lowercase() == nameLowerCase }
                 ?: throw HttpClientErrorException(HttpStatus.NOT_FOUND)
 
             val getPlaylistsItemsRequest = spotifyApi?.getPlaylistsItems(foundPlaylist.id)?.build()
@@ -95,23 +90,26 @@ class SpotifyServiceApi : MusicServiceApi {
         }
     }
 
-    /**
-     * TODO: раскомментить реальный запрос к Spotify API
-     * */
     override fun refreshTokens(refreshToken: String?): TokensPair? {
         spotifyApi?.refreshToken = refreshToken
         val authorizationCodeRefreshRequest = spotifyApi?.authorizationCodeRefresh()?.build()
 
         return try {
-//            val authorizationCodeCredentials = authorizationCodeRefreshRequest?.execute()
-//            TokensPair(authorizationCodeCredentials?.accessToken, authorizationCodeCredentials?.refreshToken)
-
-            TokensPair("test", "test")
+            val authorizationCodeCredentials = authorizationCodeRefreshRequest?.execute()
+            TokensPair(authorizationCodeCredentials?.accessToken, authorizationCodeCredentials?.refreshToken)
         } catch (e: SpotifyWebApiException) {
             null
         } catch (e: IOException) {
             null
         }
+    }
+
+    override fun getPlaylistsList(accessToken: String?): List<String>? {
+        spotifyApi?.accessToken = accessToken
+        val getListOfCurrentUsersPlaylistsRequest = spotifyApi?.listOfCurrentUsersPlaylists?.build()
+
+        val playlists = getListOfCurrentUsersPlaylistsRequest?.execute() // get the user's playlists REQUEST
+        return playlists?.items?.map { item -> item.name }
     }
 
     override fun getSavedTracksPlaylistName(): String {

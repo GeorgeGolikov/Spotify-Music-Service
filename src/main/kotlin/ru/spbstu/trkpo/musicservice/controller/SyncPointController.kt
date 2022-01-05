@@ -2,6 +2,7 @@ package ru.spbstu.trkpo.musicservice.controller
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException
@@ -17,7 +18,11 @@ class SyncPointController {
     @Autowired
     private lateinit var syncPointService: SyncPointService
 
-    @GetMapping("/playlist")
+    @PostMapping(
+        "/playlist",
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        consumes = [MediaType.APPLICATION_JSON_VALUE]
+    )
     fun getPlaylist(@RequestBody getPlaylistRequest: GetPlaylistRequest): ResponseEntity<ReturnedPlaylist> {
         return try {
             val playlist = syncPointService.getPlaylist(getPlaylistRequest.name, getPlaylistRequest.userId)
@@ -28,11 +33,14 @@ class SyncPointController {
         }
     }
 
-    @PostMapping("/playlist")
-    fun addPlaylist(@RequestBody addPlaylistRequest: AddPlaylistRequest): ResponseEntity<HttpStatus> {
-        /*
-        * TODO: implement
-        * */
-        return ResponseEntity.ok().build()
+    @PostMapping(
+        "/playlistsList",
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        consumes = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    fun getPlaylistsList(@RequestBody getPlaylistRequest: GetPlaylistRequest): ResponseEntity<List<String>> {
+        val playlists = syncPointService.getPlaylistsList(getPlaylistRequest.userId)
+        return if (playlists != null) ResponseEntity(playlists, HttpStatus.OK)
+        else ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
 }
