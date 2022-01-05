@@ -13,7 +13,11 @@ class AuthController {
     @Autowired
     private lateinit var authService: AuthService
 
-    @PostMapping("/authUrl", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(
+        "/authUrl",
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        consumes = [MediaType.APPLICATION_JSON_VALUE]
+    )
     fun getOAuthUrl(@RequestBody request: GetUrlRequest): ResponseEntity<GetUrlResponse> {
         return ResponseEntity(
             GetUrlResponse(authService.getOAuthUrl(request.tgBotId)),

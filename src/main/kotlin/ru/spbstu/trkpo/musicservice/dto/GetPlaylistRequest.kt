@@ -5,4 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class GetPlaylistRequest(@JsonProperty("guid") val userId: UUID, val name: String?)
+data class GetPlaylistRequest(
+    @JsonProperty("guid") val userId: UUID,
+    @JsonProperty("name") val name: String?
+)

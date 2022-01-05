@@ -18,7 +18,11 @@ class SyncPointController {
     @Autowired
     private lateinit var syncPointService: SyncPointService
 
-    @PostMapping("/playlist", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(
+        "/playlist",
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        consumes = [MediaType.APPLICATION_JSON_VALUE]
+    )
     fun getPlaylist(@RequestBody getPlaylistRequest: GetPlaylistRequest): ResponseEntity<ReturnedPlaylist> {
         return try {
             val playlist = syncPointService.getPlaylist(getPlaylistRequest.name, getPlaylistRequest.userId)
@@ -29,7 +33,11 @@ class SyncPointController {
         }
     }
 
-    @PostMapping("/playlistsList", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(
+        "/playlistsList",
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        consumes = [MediaType.APPLICATION_JSON_VALUE]
+    )
     fun getPlaylistsList(@RequestBody getPlaylistRequest: GetPlaylistRequest): ResponseEntity<List<String>> {
         val playlists = syncPointService.getPlaylistsList(getPlaylistRequest.userId)
         return if (playlists != null) ResponseEntity(playlists, HttpStatus.OK)
