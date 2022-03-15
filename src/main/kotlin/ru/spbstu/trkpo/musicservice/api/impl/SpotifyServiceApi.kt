@@ -133,7 +133,7 @@ class SpotifyServiceApi(
     }
 
     @Throws(Exception::class)
-    internal open fun executeAuthCodeRequest(authorizationCodeRequest: AuthorizationCodeRequest?): TokensPair {
+    internal fun executeAuthCodeRequest(authorizationCodeRequest: AuthorizationCodeRequest?): TokensPair {
         val authorizationCodeCredentials = authorizationCodeRequest?.execute()
         return TokensPair(authorizationCodeCredentials?.accessToken, authorizationCodeCredentials?.refreshToken)
     }
