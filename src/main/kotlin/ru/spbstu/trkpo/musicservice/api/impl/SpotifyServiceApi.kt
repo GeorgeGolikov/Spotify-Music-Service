@@ -1,44 +1,54 @@
 package ru.spbstu.trkpo.musicservice.api.impl
 
 import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import ru.spbstu.trkpo.musicservice.api.MusicServiceApi
 import ru.spbstu.trkpo.musicservice.dto.ReturnedPlaylist
 import ru.spbstu.trkpo.musicservice.dto.TokensPair
-import ru.spbstu.trkpo.musicservice.dto.Track
+import ru.spbstu.trkpo.musicservice.dto.MyTrack
 import se.michaelthelin.spotify.SpotifyApi
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified
+import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified
+import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack
+import se.michaelthelin.spotify.model_objects.specification.Track
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest
+import se.michaelthelin.spotify.requests.data.library.GetUsersSavedTracksRequest
+import se.michaelthelin.spotify.requests.data.playlists.GetListOfCurrentUsersPlaylistsRequest
+import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest
+import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest
 import java.io.IOException
 import java.net.URI
-import java.util.*
 import kotlin.collections.ArrayList
 
-class SpotifyServiceApi : MusicServiceApi {
-    private var baseOAuthUrl: String? = null
-    private var responseType: String? = null
-    private var clientId: String? = null
-    private var clientSecret: String? = null
-    private var redirectUri: String? = null
+@Component
+class SpotifyServiceApi(
+    private final val spotifyServiceApiConfig: SpotifyServiceApiConfig
+): MusicServiceApi {
 
-    private var spotifyApi: SpotifyApi? = null
+    private var spotifyApi = SpotifyApi.Builder()
+        .setClientId(spotifyServiceApiConfig.clientId)
+        .setClientSecret(spotifyServiceApiConfig.clientSecret)
+        .setRedirectUri(URI.create(spotifyServiceApiConfig.redirectUri))
+        .build()
 
     override fun getUrl(tgBotId: String): String {
         val scope = getReadPlaylistScopes()
 
-        return baseOAuthUrl +
-                "response_type=" + responseType + "&" +
-                "client_id=" + clientId + "&" +
+        return spotifyServiceApiConfig.baseOAuthUrl +
+                "response_type=" + spotifyServiceApiConfig.responseType + "&" +
+                "client_id=" + spotifyServiceApiConfig.clientId + "&" +
                 "scope=" + scope + "&" +
-                "redirect_uri=" + redirectUri + "&" +
+                "redirect_uri=" + spotifyServiceApiConfig.redirectUri + "&" +
                 "state=" + tgBotId
     }
 
     override fun register(authCode: String): TokensPair? {
         val authorizationCodeRequest = spotifyApi?.authorizationCode(authCode)?.build()
         return try {
-            val authorizationCodeCredentials = authorizationCodeRequest?.execute()
-            TokensPair(authorizationCodeCredentials?.accessToken, authorizationCodeCredentials?.refreshToken)
+            executeAuthCodeRequest(authorizationCodeRequest)
         } catch (e: SpotifyWebApiException) {
             null
         } catch (e: IOException) {
@@ -50,35 +60,35 @@ class SpotifyServiceApi : MusicServiceApi {
         spotifyApi?.accessToken = accessToken
 
         return if (name == null || name == "") {
+            // get the user's liked songs REQUEST
             val getUsersSavedTracksRequest = spotifyApi?.usersSavedTracks?.build()
-
-            val savedTracks = getUsersSavedTracksRequest?.execute() // get the user's liked songs REQUEST
-            val tracks = savedTracks?.items?.map { t ->
-                val track = t.track
-                val artists = getArtistsOfTrackInOneString(track.artists)
-                Track(track.name, artists, track.album.name)
+            val tracks = executeGetUsersSavedTracksRequest(getUsersSavedTracksRequest)?.map { t ->
+                val artists = getArtistsOfTrackInOneString(t.artists)
+                MyTrack(t.name, artists, t.album.name)
             }
 
             ReturnedPlaylist(getSavedTracksPlaylistName(), tracks)
         } else {
+            // get the user's playlists REQUEST
             val getListOfCurrentUsersPlaylistsRequest = spotifyApi?.listOfCurrentUsersPlaylists?.build()
-
-            val playlists = getListOfCurrentUsersPlaylistsRequest?.execute() // get the user's playlists REQUEST
+            val playlists = executeGetListOfCurrentUsersPlaylistsRequest(getListOfCurrentUsersPlaylistsRequest)
             val nameLowerCase = name.lowercase()
-            val foundPlaylist = playlists?.items?.find { p -> p.name.lowercase() == nameLowerCase }
+            val foundPlaylist = playlists?.find { p -> p.name.lowercase() == nameLowerCase }
                 ?: throw HttpClientErrorException(HttpStatus.NOT_FOUND)
 
+            // get the items from the above playlist REQUEST
             val getPlaylistsItemsRequest = spotifyApi?.getPlaylistsItems(foundPlaylist.id)?.build()
-            val playlistTracks = getPlaylistsItemsRequest?.execute() // get the items from the above playlist REQUEST
+            val playlistTracks = executeGetPlaylistsItemsRequest(getPlaylistsItemsRequest)
 
-            val tracksArray: ArrayList<Track> = ArrayList()
-            playlistTracks?.items?.forEach { item ->
-                val trackId = item?.track?.id
-                val getTrackRequest = spotifyApi?.getTrack(trackId)?.build()
+            val tracksArray: ArrayList<MyTrack> = ArrayList()
+            playlistTracks?.forEach { item ->
+                val trackId = item.track?.id
                 try {
-                    val track = getTrackRequest?.execute() // get the track of the above item REQUEST
+                    // get the track of the above item REQUEST
+                    val getTrackRequest = spotifyApi?.getTrack(trackId)?.build()
+                    val track = executeGetTrackRequest(getTrackRequest)
                     val artists = getArtistsOfTrackInOneString(track!!.artists)
-                    tracksArray.add(Track(track.name, artists, track.album.name))
+                    tracksArray.add(MyTrack(track.name, artists, track.album.name))
                 } catch (e: IOException) {
                     println(e.message)
                 } catch (e: SpotifyWebApiException) {
@@ -93,10 +103,8 @@ class SpotifyServiceApi : MusicServiceApi {
     override fun refreshTokens(refreshToken: String?): TokensPair? {
         spotifyApi?.refreshToken = refreshToken
         val authorizationCodeRefreshRequest = spotifyApi?.authorizationCodeRefresh()?.build()
-
         return try {
-            val authorizationCodeCredentials = authorizationCodeRefreshRequest?.execute()
-            TokensPair(authorizationCodeCredentials?.accessToken, authorizationCodeCredentials?.refreshToken)
+            executeAuthCodeRefreshRequest(authorizationCodeRefreshRequest)
         } catch (e: SpotifyWebApiException) {
             null
         } catch (e: IOException) {
@@ -106,10 +114,10 @@ class SpotifyServiceApi : MusicServiceApi {
 
     override fun getPlaylistsList(accessToken: String?): List<String>? {
         spotifyApi?.accessToken = accessToken
+        // get the user's playlists REQUEST
         val getListOfCurrentUsersPlaylistsRequest = spotifyApi?.listOfCurrentUsersPlaylists?.build()
-
-        val playlists = getListOfCurrentUsersPlaylistsRequest?.execute() // get the user's playlists REQUEST
-        return playlists?.items?.map { item -> item.name }
+        return executeGetListOfCurrentUsersPlaylistsRequest(getListOfCurrentUsersPlaylistsRequest)
+            ?.map { item -> item.name }
     }
 
     override fun getSavedTracksPlaylistName(): String {
@@ -120,22 +128,51 @@ class SpotifyServiceApi : MusicServiceApi {
         return "$name from Spotify"
     }
 
-    override fun setProperties(properties: Properties) {
-        baseOAuthUrl = properties.getProperty("spotify.oauth.base-oauth-url")
-        responseType = properties.getProperty("spotify.oauth.response-type")
-        clientId = properties.getProperty("spotify.oauth.client-id")
-        clientSecret = properties.getProperty("spotify.oauth.client-secret")
-        redirectUri = properties.getProperty("spotify.oauth.redirect-uri")
-
-        spotifyApi = SpotifyApi.Builder()
-            .setClientId(clientId)
-            .setClientSecret(clientSecret)
-            .setRedirectUri(URI.create(redirectUri))
-            .build()
-    }
-
     override fun getReadPlaylistScopes(): String {
         return "user-library-read%20user-top-read%20playlist-read-private"
+    }
+
+    @Throws(Exception::class)
+    internal open fun executeAuthCodeRequest(authorizationCodeRequest: AuthorizationCodeRequest?): TokensPair {
+        val authorizationCodeCredentials = authorizationCodeRequest?.execute()
+        return TokensPair(authorizationCodeCredentials?.accessToken, authorizationCodeCredentials?.refreshToken)
+    }
+
+    internal fun executeGetUsersSavedTracksRequest(
+        getUsersSavedTracksRequest: GetUsersSavedTracksRequest?
+    ): List<Track>? {
+
+        val savedTracks = getUsersSavedTracksRequest?.execute()
+        return savedTracks?.items?.map {
+                t -> t.track
+        }
+    }
+
+    internal fun executeGetListOfCurrentUsersPlaylistsRequest(
+        getListOfCurrentUsersPlaylistsRequest: GetListOfCurrentUsersPlaylistsRequest?
+    ): Array<PlaylistSimplified>? {
+
+        return getListOfCurrentUsersPlaylistsRequest?.execute()?.items
+    }
+
+    internal fun executeGetPlaylistsItemsRequest(
+        getPlaylistsItemsRequest: GetPlaylistsItemsRequest?
+    ): Array<PlaylistTrack>? {
+        return getPlaylistsItemsRequest?.execute()?.items
+    }
+
+    internal fun executeGetTrackRequest(
+        getTrackRequest: GetTrackRequest?
+    ): Track? {
+        return getTrackRequest?.execute()
+    }
+
+    @Throws(Exception::class)
+    internal fun executeAuthCodeRefreshRequest(
+        authorizationCodeRefreshRequest: AuthorizationCodeRefreshRequest?
+    ): TokensPair {
+        val authorizationCodeCredentials = authorizationCodeRefreshRequest?.execute()
+        return TokensPair(authorizationCodeCredentials?.accessToken, authorizationCodeCredentials?.refreshToken)
     }
 
     private fun getArtistsOfTrackInOneString(artists: Array<ArtistSimplified>): String {

@@ -6,12 +6,9 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException
-import ru.spbstu.trkpo.musicservice.dto.AddPlaylistRequest
 import ru.spbstu.trkpo.musicservice.dto.GetPlaylistRequest
 import ru.spbstu.trkpo.musicservice.dto.ReturnedPlaylist
-import ru.spbstu.trkpo.musicservice.dto.Track
 import ru.spbstu.trkpo.musicservice.service.SyncPointService
-import java.util.*
 
 @RestController
 class SyncPointController {
