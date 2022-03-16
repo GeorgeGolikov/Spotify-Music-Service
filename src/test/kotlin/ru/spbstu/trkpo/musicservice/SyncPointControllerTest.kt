@@ -28,49 +28,39 @@ class SyncPointControllerTest {
 
     @Test
     internal fun getPlaylistTest() {
-        val guid = UUID.randomUUID()
-        val name = "Playlist"
-        val getPlaylistRequest = GetPlaylistRequest(guid, name)
-        val playlist = ReturnedPlaylist(name, listOf())
+        val playlist = ReturnedPlaylist(NAME, listOf())
         val expectedResponse = ResponseEntity(playlist, HttpStatus.OK)
-        `when`(syncPointService.getPlaylist(anyString(), eq(guid)))
+        `when`(syncPointService.getPlaylist(anyString(), eq(GUID)))
             .thenReturn(playlist)
-        val actualResponse = syncPointController.getPlaylist(getPlaylistRequest)
+        val actualResponse = syncPointController.getPlaylist(GET_PLAYLIST_REQUEST)
         assertEquals(expectedResponse, actualResponse)
     }
 
     @Test
     internal fun getPlaylistWhenNullTest() {
-        val guid = UUID.randomUUID()
-        val name = "Playlist"
-        val getPlaylistRequest = GetPlaylistRequest(guid, name)
         val playlist = null
         val expectedResponse = ResponseEntity<ReturnedPlaylist>(HttpStatus.UNAUTHORIZED)
-        `when`(syncPointService.getPlaylist(anyString(), eq(guid)))
+        `when`(syncPointService.getPlaylist(anyString(), eq(GUID)))
             .thenReturn(playlist)
-        val actualResponse = syncPointController.getPlaylist(getPlaylistRequest)
+        val actualResponse = syncPointController.getPlaylist(GET_PLAYLIST_REQUEST)
         assertEquals(expectedResponse, actualResponse)
     }
 
     @Test
     internal fun getPlaylistExceptionOccurredTest() {
-        val guid = UUID.randomUUID()
-        val name = "Playlist"
-        val getPlaylistRequest = GetPlaylistRequest(guid, name)
         val expectedResponse = ResponseEntity<ReturnedPlaylist>(HttpStatus.FORBIDDEN)
-        `when`(syncPointService.getPlaylist(anyString(), eq(guid)))
+        `when`(syncPointService.getPlaylist(anyString(), eq(GUID)))
             .thenThrow(HttpClientErrorException(HttpStatus.FORBIDDEN))
-        val actualResponse = syncPointController.getPlaylist(getPlaylistRequest)
+        val actualResponse = syncPointController.getPlaylist(GET_PLAYLIST_REQUEST)
         assertEquals(expectedResponse, actualResponse)
     }
 
     @Test
     internal fun getPlaylistsListTest() {
-        val guid = UUID.randomUUID()
-        val getPlaylistsListRequest = GetPlaylistRequest(guid, null)
+        val getPlaylistsListRequest = GetPlaylistRequest(GUID, null)
         val playlists = listOf<String>()
         val expectedResponse = ResponseEntity(playlists, HttpStatus.OK)
-        `when`(syncPointService.getPlaylistsList(eq(guid)))
+        `when`(syncPointService.getPlaylistsList(eq(GUID)))
             .thenReturn(playlists)
         val actualResponse = syncPointController.getPlaylistsList(getPlaylistsListRequest)
         assertEquals(expectedResponse, actualResponse)
@@ -78,13 +68,18 @@ class SyncPointControllerTest {
 
     @Test
     internal fun getPlaylistsListWhenNullTest() {
-        val guid = UUID.randomUUID()
-        val getPlaylistsListRequest = GetPlaylistRequest(guid, null)
+        val getPlaylistsListRequest = GetPlaylistRequest(GUID, null)
         val playlists = null
         val expectedResponse = ResponseEntity<ReturnedPlaylist>(HttpStatus.UNAUTHORIZED)
-        `when`(syncPointService.getPlaylistsList(eq(guid)))
+        `when`(syncPointService.getPlaylistsList(eq(GUID)))
             .thenReturn(playlists)
         val actualResponse = syncPointController.getPlaylistsList(getPlaylistsListRequest)
         assertEquals(expectedResponse, actualResponse)
+    }
+
+    companion object {
+        private const val NAME = "Playlist"
+        private val GUID = UUID.randomUUID()
+        private val GET_PLAYLIST_REQUEST = GetPlaylistRequest(GUID, NAME)
     }
 }

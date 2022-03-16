@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.anyString
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.eq
 import org.springframework.http.HttpStatus
@@ -29,68 +30,66 @@ class AuthControllerTest {
 
     @Test
     internal fun getOAuthUrlTest() {
-        val request = GetUrlRequest("tg-id")
-        val url = "test-url"
+        val request = GetUrlRequest(TG_BOT_ID)
         val expectedResponse = ResponseEntity(
-            GetUrlResponse(url),
+            GetUrlResponse(URL),
             HttpStatus.OK
         )
         `when`(authService.getOAuthUrl(anyString()))
-            .thenReturn("test-url")
+            .thenReturn(URL)
         val actualResponse = authController.getOAuthUrl(request)
         assertEquals(expectedResponse, actualResponse)
     }
 
     @Test
     internal fun registerWhenAuthorizedTest() {
-        val guid = UUID.randomUUID()
-        val authCode = "authCode"
-        val authRequest = AuthRequest(authCode, guid)
         val expectedResponse = ResponseEntity(
-            AuthResponse(guid),
+            AuthResponse(GUID),
             HttpStatus.OK
         )
-        `when`(authService.authorize(anyString(), eq(guid)))
+        `when`(authService.authorize(anyString(), eq(GUID)))
             .thenReturn(true)
-        val actualResponse = authController.register(authRequest)
+        val actualResponse = authController.register(AUTH_REQUEST)
         assertEquals(expectedResponse, actualResponse)
     }
 
     @Test
     internal fun registerWhenNotAuthorizedTest() {
-        val guid = UUID.randomUUID()
-        val authCode = "authCode"
-        val authRequest = AuthRequest(authCode, guid)
         val expectedResponse = badRequest().build<AuthResponse>()
-        `when`(authService.authorize(anyString(), eq(guid)))
+        `when`(authService.authorize(anyString(), eq(GUID)))
             .thenReturn(false)
-        val actualResponse = authController.register(authRequest)
+        val actualResponse = authController.register(AUTH_REQUEST)
         assertEquals(expectedResponse, actualResponse)
     }
 
     @Test
     internal fun registerWhenUserIdNullAndAuthCodeCorrectTest() {
-        val guid = UUID.randomUUID()
-        val authCode = "authCode"
-        val authRequest = AuthRequest(authCode, null)
+        val authRequest = AuthRequest(AUTH_CODE, null)
         val expectedResponse = ResponseEntity(
-            AuthResponse(guid),
+            AuthResponse(GUID),
             HttpStatus.OK
         )
         `when`(authService.register(anyString()))
-            .thenReturn(guid)
+            .thenReturn(GUID)
         val actualResponse = authController.register(authRequest)
         assertEquals(expectedResponse, actualResponse)
     }
 
     @Test
     internal fun registerWhenUserIdNullAndAuthCodeNotCorrectTest() {
-        val authCode = "authCode"
-        val authRequest = AuthRequest(authCode, null)
+        val authRequest = AuthRequest(AUTH_CODE, null)
         val expectedResponse = badRequest().build<AuthResponse>()
         `when`(authService.register(anyString()))
             .thenReturn(null)
         val actualResponse = authController.register(authRequest)
         assertEquals(expectedResponse, actualResponse)
+    }
+
+    companion object {
+        private const val TG_BOT_ID = "tg-id"
+        private const val URL = "test-url"
+        private const val AUTH_CODE = "authCode"
+        private val GUID = UUID.randomUUID()
+        private val AUTH_REQUEST = AuthRequest(AUTH_CODE, GUID)
     }
 }
