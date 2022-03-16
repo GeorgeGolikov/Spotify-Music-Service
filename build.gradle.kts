@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.6.0"
     kotlin("plugin.spring") version "1.6.0"
     kotlin("plugin.jpa") version "1.6.0"
+    id("jacoco")
 }
 
 group = "ru.spbstu.trkpo"
@@ -15,6 +16,9 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://repo.gradle.org/gradle/libs-releases-local/")
+    }
 }
 
 dependencies {
@@ -40,4 +44,33 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
+    doLast { // print the report url for easier access
+        println("file://${project.rootDir}/build/reports/jacoco/test/html/index.html")
+    }
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+                fileTree(it) {
+                    exclude(
+                        "**/ru/spbstu/trkpo/musicservice/dto/**",
+                        "**/ru/spbstu/trkpo/musicservice/entity/**",
+                        "**/ru/spbstu/trkpo/musicservice/dao/**",
+                        "**/ru/spbstu/trkpo/musicservice/api/impl/MusicServiceApiAggregator.class",
+                        "**/ru/spbstu/trkpo/musicservice/api/impl/SpotifyServiceApiConfig.class",
+                        "**/ru/spbstu/trkpo/musicservice/MusicServiceApplicationKt.class",
+                        "**/ru/spbstu/trkpo/musicservice/MusicServiceApplication.class"
+                    )
+                }
+            }
+        )
+    )
+}
+
+jacoco {
+    toolVersion = "0.8.7"
+}
+

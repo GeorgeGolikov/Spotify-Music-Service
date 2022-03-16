@@ -2,6 +2,7 @@ package ru.spbstu.trkpo.musicservice.service.impl
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import ru.spbstu.trkpo.musicservice.annotation.Generated
 import ru.spbstu.trkpo.musicservice.api.MusicServiceApi
 import ru.spbstu.trkpo.musicservice.api.impl.MusicServiceApiAggregator
 import ru.spbstu.trkpo.musicservice.dao.TokensInfoDao
@@ -22,6 +23,7 @@ class SyncPointServiceImpl: SyncPointService {
 
     private lateinit var musicServiceApi: MusicServiceApi
 
+    @Generated
     @PostConstruct
     private fun init() {
         musicServiceApi = musicServiceApiAggregator.musicServiceApi
