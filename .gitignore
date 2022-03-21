@@ -1,9 +1,5 @@
 HELP.md
-.gradle
 build/
-gradle/
-gradlew.bat
-gradlew
 
 ### STS ###
 .apt_generated
