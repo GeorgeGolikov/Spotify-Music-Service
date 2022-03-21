@@ -35,6 +35,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.16.3")
     testImplementation("org.testcontainers:testcontainers:1.16.3")
     testImplementation("org.testcontainers:junit-jupiter:1.16.3")
+    testImplementation("com.h2database:h2:2.1.210")
 }
 
 tasks.withType<KotlinCompile> {
