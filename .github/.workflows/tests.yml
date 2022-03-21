@@ -1,0 +1,25 @@
+name: PullRequestGradleTest
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: GradleTest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Java 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+
+      - name: Grant Permissions to gradlew
+        run: chmod +x gradlew
+      - name: Test
+        run: gradle test
