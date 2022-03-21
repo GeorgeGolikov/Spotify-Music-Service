@@ -8,5 +8,5 @@ import java.util.*
 data class AddPlaylistRequest(
     @JsonProperty("guid") val userId: UUID,
     @JsonProperty("name") val name: String,
-    @JsonProperty("tracks") val tracks: List<Track>
+    @JsonProperty("tracks") val tracks: List<MyTrack>
 )

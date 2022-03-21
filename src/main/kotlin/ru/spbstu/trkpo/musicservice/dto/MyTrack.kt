@@ -1,6 +1,6 @@
 package ru.spbstu.trkpo.musicservice.dto
 
-data class Track(
+data class MyTrack(
     val name: String,
     val artist: String,
     val album: String
