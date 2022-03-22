@@ -19,7 +19,6 @@ import org.testcontainers.utility.DockerImageName
 import ru.spbstu.trkpo.musicservice.api.MusicServiceApi
 import ru.spbstu.trkpo.musicservice.dto.ReturnedPlaylist
 import ru.spbstu.trkpo.musicservice.dto.TokensPair
-import ru.spbstu.trkpo.musicservice.entity.TokensInfo
 import ru.spbstu.trkpo.musicservice.service.impl.AuthServiceImpl
 import ru.spbstu.trkpo.musicservice.service.impl.SyncPointServiceImpl
 import java.sql.Connection
@@ -30,11 +29,7 @@ fun postgres(imageName: String, opts: JdbcDatabaseContainer<Nothing>.() -> Unit)
     PostgreSQLContainer<Nothing>(DockerImageName.parse(imageName)).apply(opts)
 
 @Testcontainers
-//@ExtendWith(SpringExtension::class)
 @SpringBootTest
-//@ExtendWith(MockitoExtension::class)
-//@ContextConfiguration(classes = [(IntegrationTests.Initializer::class)])
-//@ActiveProfiles("integration-test")
 class IntegrationDBTests(
     @Autowired val authService: AuthServiceImpl,
     @Autowired val syncPointService: SyncPointServiceImpl
@@ -164,17 +159,9 @@ class IntegrationDBTests(
         }
         private lateinit var connection: Connection
 
-        private const val TG_BOT_ID = "tg-id"
-        private const val URL = "test-url"
         private const val AUTH_CODE = "authCode"
         private const val PLAYLIST_NAME = "Playlist"
         private val TOKENS_PAIR = TokensPair("Access", "Refresh")
         private val TOKENS_PAIR_NEW = TokensPair("Access1", "Refresh1")
-        private val GUID = UUID.randomUUID()
-        private val USER_INFO = TokensInfo().apply {
-            userId = GUID
-            accessToken = TOKENS_PAIR.accessToken
-            refreshToken = TOKENS_PAIR.refreshToken
-        }
     }
 }

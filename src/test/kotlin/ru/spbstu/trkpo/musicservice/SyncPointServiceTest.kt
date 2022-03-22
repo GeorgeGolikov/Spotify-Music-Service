@@ -143,7 +143,7 @@ class SyncPointServiceTest {
 
     companion object {
         private const val NAME = "Playlist"
-        val PLAYLISTS_LIST = listOf("Playlist1", "Playlist2", "Playlist3")
+        private val PLAYLISTS_LIST = listOf("Playlist1", "Playlist2", "Playlist3")
         private val TOKENS_PAIR = TokensPair("Access", "Refresh")
         private val GUID = UUID.randomUUID()
         private val USER_INFO = TokensInfo().apply {
