@@ -1,7 +1,9 @@
 package ru.spbstu.trkpo.musicservice
 
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import org.mockito.AdditionalMatchers.not
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.`when`
@@ -16,7 +18,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
-import ru.spbstu.trkpo.musicservice.api.MusicServiceApi
+import ru.spbstu.trkpo.musicservice.api.impl.SpotifyServiceApi
 import ru.spbstu.trkpo.musicservice.dto.ReturnedPlaylist
 import ru.spbstu.trkpo.musicservice.dto.TokensPair
 import ru.spbstu.trkpo.musicservice.service.impl.AuthServiceImpl
@@ -34,8 +36,8 @@ class IntegrationDBTests(
     @Autowired val authService: AuthServiceImpl,
     @Autowired val syncPointService: SyncPointServiceImpl
 ) {
-    @MockBean
-    private lateinit var musicServiceApi: MusicServiceApi
+    @MockBean(name = "spotifyServiceApi")
+    private lateinit var musicServiceApi: SpotifyServiceApi
 
     @Test
     internal fun `when got tokens while registering, they are persisted in db`() {
