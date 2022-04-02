@@ -7,7 +7,6 @@ plugins {
     kotlin("plugin.spring") version "1.6.0"
     kotlin("plugin.jpa") version "1.6.0"
     id("jacoco")
-    java
 }
 
 group = "ru.spbstu.trkpo"
@@ -71,6 +70,12 @@ tasks.jacocoTestReport {
             }
         )
     )
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "ru.spbstu.trkpo.musicservice.MusicServiceApplication.kt"
+    }
 }
 
 jacoco {
