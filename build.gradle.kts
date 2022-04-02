@@ -72,11 +72,6 @@ tasks.jacocoTestReport {
     )
 }
 
-tasks.withType<Jar> {
-    manifest {
-        attributes["Main-Class"] = "ru.spbstu.trkpo.musicservice.MusicServiceApplicationKt"
-    }
-}
 springBoot {
     mainClass.set("ru.spbstu.trkpo.musicservice.MusicServiceApplicationKt")
 }
