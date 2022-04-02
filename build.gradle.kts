@@ -74,7 +74,7 @@ tasks.jacocoTestReport {
 
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "ru.spbstu.trkpo.musicservice.MusicServiceApplication.kt"
+        attributes["Main-Class"] = "ru.spbstu.trkpo.musicservice.MusicServiceApplication"
     }
 }
 
