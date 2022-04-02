@@ -73,7 +73,7 @@ tasks.jacocoTestReport {
 }
 
 springBoot {
-    mainClass.set("ru.spbstu.trkpo.musicservice.MusicServiceApplication")
+    mainClass.set("ru.spbstu.trkpo.musicservice.MusicServiceApplicationKt")
 }
 
 jacoco {
