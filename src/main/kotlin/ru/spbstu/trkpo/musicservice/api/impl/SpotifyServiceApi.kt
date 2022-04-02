@@ -23,7 +23,7 @@ import java.io.IOException
 import java.net.URI
 import kotlin.collections.ArrayList
 
-@Component
+@Component("spotifyServiceApi")
 class SpotifyServiceApi(
     private final val spotifyServiceApiConfig: SpotifyServiceApiConfig
 ): MusicServiceApi {

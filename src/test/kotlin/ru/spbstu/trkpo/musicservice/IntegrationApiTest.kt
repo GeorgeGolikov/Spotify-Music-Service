@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import ru.spbstu.trkpo.musicservice.api.MusicServiceApi
+import ru.spbstu.trkpo.musicservice.api.impl.SpotifyServiceApi
 import ru.spbstu.trkpo.musicservice.dao.TokensInfoDao
 import ru.spbstu.trkpo.musicservice.dto.ReturnedPlaylist
 import ru.spbstu.trkpo.musicservice.dto.TokensPair
@@ -32,8 +32,8 @@ import java.util.*
 class IntegrationApiTest(
     @Autowired val mockMvc: MockMvc
 ) {
-    @MockBean
-    private lateinit var musicServiceApi: MusicServiceApi
+    @MockBean(name = "spotifyServiceApi")
+    private lateinit var musicServiceApi: SpotifyServiceApi
 
     @MockBean
     private lateinit var tokensInfo: TokensInfoDao
